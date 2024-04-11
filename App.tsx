@@ -1,118 +1,55 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState, useEffect } from 'react';
+import { StatusBar, StyleSheet, TextInput, Text, View, Button, TouchableOpacity, Alert } from 'react-native';
+import styles from './style'; // Предполагается, что у вас есть файл стилей styles.ts
+import ActionButton from './components/ActionButton';
+import useStore from './store';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+export default function App() {
+  const [text, setText] = useState<string>('');
+  const { dataStore, getTodos, deleteTodo, createTodo } = useStore();
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  useEffect(() => {
+    getTodos();
+    //console.log(dataStore);
+  }, [text]);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const showInfoAlert = () => {
+    createTodo({ name: 'default', task: text, isComplete: false });
+    console.log('---')
+    // Alert.alert(
+    //   'Информация',
+    //   data.toString(),
+    //   [{ text: 'OK' }],
+    //   { cancelable: false }
+    // );
+  };
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const handleDelete = (index: number) => {
+    deleteTodo(index);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <View style={styles.container}>
+      <View style={[styles.inputContainer, styles.universeContainer]}>
+        <TextInput
+          style={styles.input}
+          placeholder="Введите текст"
+          value={text}
+          onChangeText={(text) => setText(text)}
+        />
+        <ActionButton onPress={showInfoAlert} action={'+'} />
+      </View>
+
+      <Text style={styles.title}>Дела на день:</Text>
+      {dataStore.map((item, index) => (
+        <View style={[styles.universeContainer, styles.itemContainer]} key={index}>
+          <View style={styles.items}>
+            <Text style={styles.text}>{item.task}</Text>
+          </View>
+          <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      ))}
+      <StatusBar style="auto" />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
