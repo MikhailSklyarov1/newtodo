@@ -34,7 +34,6 @@ const useStore = create<Store>((set) => ({
     deleteTodo: (id: number) => {
         axios.delete(`http://unit-vlg.ru:9000/api/actions/delete?id=${id}`)
             .then(() => {
-                // Если удаление успешно, можно вызвать getTodos() для обновления данных
                 set((state) => {
                     const updatedDataStore = state.dataStore.filter(todo => todo.id !== id);
                     return { dataStore: updatedDataStore };

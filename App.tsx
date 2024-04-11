@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, TextInput, Text, View, Button, TouchableOpacity, Alert } from 'react-native';
-import styles from './style'; // Предполагается, что у вас есть файл стилей styles.ts
+import styles from './style';
 import ActionButton from './components/ActionButton';
 import useStore from './store';
 
 export default function App() {
   const [text, setText] = useState<string>('');
+  const [trigger, setTrigger] = useState(true);
   const { dataStore, getTodos, deleteTodo, createTodo } = useStore();
 
   useEffect(() => {
     getTodos();
-    //console.log(dataStore);
-  }, [text]);
+  }, [trigger]);
 
   const showInfoAlert = () => {
     createTodo({ name: 'default', task: text, isComplete: false });
-    console.log('---')
+    setTrigger(!trigger)
     // Alert.alert(
     //   'Информация',
     //   data.toString(),
