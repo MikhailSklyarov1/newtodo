@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, StyleSheet, TextInput, Text, View, Button, TouchableOpacity, Alert } from 'react-native';
+import { StatusBar, StyleSheet, TextInput, Text, View, Button, TouchableOpacity, Alert, ScrollView  } from 'react-native';
 import styles from './style';
 import ActionButton from './components/ActionButton';
 import useStore from './store';
@@ -41,6 +41,7 @@ export default function App() {
       </View>
 
       <Text style={styles.title}>Дела на день:</Text>
+      <ScrollView style={styles.scroll}>
       {dataStore.map((item, index) => (
         <View style={[styles.universeContainer, styles.itemContainer]} key={index}>
           <View style={styles.items}>
@@ -49,6 +50,7 @@ export default function App() {
           <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
         </View>
       ))}
+      </ScrollView>
       <StatusBar style="auto" />
     </View>
   );

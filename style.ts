@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
 
   itemContainer: {
     marginTop: 30,
+  },
+
+  scroll: {
+    marginBottom: 20,
+    paddingRight: 10,
   }
 
 
