@@ -5,6 +5,8 @@ import { RouteProp } from '@react-navigation/native';
 import styles from '../style';
 import ActionButton from '../components/ActionButton';
 import useStore from '../store';
+import Icon from 'react-native-vector-icons/Ionicons'; 
+
 
 type RootStackParamList = {
   Home: undefined;
@@ -48,7 +50,7 @@ const App: React.FC<Props> = ({ navigation }) => {
         <ActionButton onPress={showInfoAlert} action={'+'} />
       </View>
 
-      <Text style={styles.title}>Дела на день:</Text>
+      <Text style={styles.title}>Картегории:</Text>
       <ScrollView style={styles.scroll}>
         {dataStore.map((item) => (
           <TouchableOpacity key={item.id} onPress={() => navigation.navigate('TodoDetails', { itemId: item.id })}>
@@ -57,6 +59,8 @@ const App: React.FC<Props> = ({ navigation }) => {
                 <Text style={styles.text}>{item.task}</Text>
               </View>
               <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
+              <ActionButton onPress={() => handleDelete(item.id)} action={'ed'} />
+              <Icon name="pencil" size={30}color="#4F8EF7" />
             </View>
           </TouchableOpacity>
         ))}

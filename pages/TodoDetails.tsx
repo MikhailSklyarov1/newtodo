@@ -59,9 +59,8 @@ const TodoDetails: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Задача: {todoItem.task}</Text>
-      <Text style={styles.title}>ID: {todoItem.id}</Text>
-      <Button title="Удалить" onPress={handleDeleteBtn} />
+      <Text style={styles.title}>Категория {todoItem.task}</Text>
+      <Button title="Удалить категорию" onPress={handleDeleteBtn} />
       <View style={[styles.inputContainer, styles.universeContainer]}>
         <TextInput
           style={styles.input}
