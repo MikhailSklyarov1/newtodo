@@ -2,8 +2,10 @@ import { create } from 'zustand';
 import axios from 'axios';
 
 interface TodoItem {
+    name?: string;
     task: string;
-    id: number;
+    id?: number;
+    isComplete?: boolean;
 }
 
 interface Store {
@@ -12,6 +14,9 @@ interface Store {
     getTodos: () => void;
     deleteTodo: (id: number) => void;
     createTodo: (newTodo: { name: string, task: string, isComplete: boolean }) => void;
+    getSubTodos: (idTodo: number | undefined) => void;
+    deleteSubTodo: (id: number, idSub: number) => void;
+    createSubTodo: (newTodo: TodoItem, id: number | undefined) => void;
 }
 
 const useStore = create<Store>((set) => ({
@@ -66,7 +71,7 @@ const useStore = create<Store>((set) => ({
 
     // Для подзадач
 
-    getSubTodos: (idTodo: number) => {
+    getSubTodos: (idTodo: number | undefined) => {
         axios.get<TodoItem[]>(`http://unit-vlg.ru:9000/api/actionsSubTodos/getAll?id=${idTodo}`)
             .then(res => {
                 const todos = res.data;
@@ -96,7 +101,7 @@ const useStore = create<Store>((set) => ({
             });
     },
 
-    createSubTodo: (newTodo: TodoItem, id: number) => {
+    createSubTodo: (newTodo: TodoItem, id: number | undefined) => {
         axios.post<TodoItem[]>(`http://unit-vlg.ru:9000/api/actionsSubTodos/create?id=${id}`, newTodo)
             .then(res => {
                 const todos = res.data;
