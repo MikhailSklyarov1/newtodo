@@ -8,6 +8,7 @@ interface TodoItem {
 
 interface Store {
     dataStore: TodoItem[];
+    dataStoreSubTasks: TodoItem[];
     getTodos: () => void;
     deleteTodo: (id: number) => void;
     createTodo: (newTodo: { name: string, task: string, isComplete: boolean }) => void;
@@ -15,6 +16,7 @@ interface Store {
 
 const useStore = create<Store>((set) => ({
     dataStore: [],
+    dataStoreSubTasks: [],
 
     getTodos: () => {
         axios.get<TodoItem[]>('http://unit-vlg.ru:9000/api/actions/getAll')
@@ -54,6 +56,56 @@ const useStore = create<Store>((set) => ({
                 }));
                 set((state) => {
                     return { dataStore: nameAndIdList };
+                });
+            })
+            .catch(error => {
+                console.error('Error creating todo:', error);
+            });
+    },
+
+
+    // Для подзадач
+
+    getSubTodos: (idTodo: number) => {
+        axios.get<TodoItem[]>(`http://unit-vlg.ru:9000/api/actionsSubTodos/getAll?id=${idTodo}`)
+            .then(res => {
+                const todos = res.data;
+                const mainData = todos.map(item => ({
+                    task: item.task,
+                    id: item.id
+                }));
+                set(() => ({ dataStoreSubTasks: mainData }));
+            })
+            .catch(error => {
+                console.error('Error fetching todos:', error);
+            });
+    },
+
+    deleteSubTodo: (id: number, idSub: number) => {
+        axios.delete<TodoItem[]>(`http://unit-vlg.ru:9000/api/actionsSubTodos/delete?id=${id}&id_sub=${idSub}`)
+            .then(res => {
+                const todos = res.data;
+                const mainData = todos.map(item => ({
+                    task: item.task,
+                    id: item.id
+                }));
+                set(() => ({ dataStoreSubTasks: mainData }));
+            })
+            .catch(error => {
+                console.error('Error deleting todo:', error);
+            });
+    },
+
+    createSubTodo: (newTodo: TodoItem, id: number) => {
+        axios.post<TodoItem[]>(`http://unit-vlg.ru:9000/api/actionsSubTodos/create?id=${id}`, newTodo)
+            .then(res => {
+                const todos = res.data;
+                const nameAndIdList = todos.map(item => ({
+                    id: item.id,
+                    task: item.task
+                }));
+                set((state) => {
+                    return { dataStoreSubTasks: nameAndIdList };
                 });
             })
             .catch(error => {

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { StatusBar, TextInput, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import styles from './style';
-import ActionButton from './components/ActionButton';
-import useStore from './store';
+import styles from '../style';
+import ActionButton from '../components/ActionButton';
+import useStore from '../store';
 
 type RootStackParamList = {
   Home: undefined;
