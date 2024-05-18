@@ -1,31 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, StyleSheet, TextInput, Text, View, Button, TouchableOpacity, Alert, ScrollView  } from 'react-native';
+import { StatusBar, TextInput, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import styles from './style';
 import ActionButton from './components/ActionButton';
 import useStore from './store';
 
-export default function App() {
+type RootStackParamList = {
+  Home: undefined;
+  TodoDetails: { itemId: number };
+};
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
+
+interface Props {
+  navigation: HomeScreenNavigationProp;
+  route: HomeScreenRouteProp;
+}
+
+const App: React.FC<Props> = ({ navigation }) => {
   const [text, setText] = useState<string>('');
-  const [trigger, setTrigger] = useState(true);
   const { dataStore, getTodos, deleteTodo, createTodo } = useStore();
 
   useEffect(() => {
     getTodos();
-  }, [trigger]);
+  }, []);
 
   const showInfoAlert = () => {
     createTodo({ name: 'default', task: text, isComplete: false });
-    setTrigger(!trigger)
-    // Alert.alert(
-    //   'Информация',
-    //   data.toString(),
-    //   [{ text: 'OK' }],
-    //   { cancelable: false }
-    // );
+    setText(''); // очищаем текстовое поле после добавления
   };
 
-  const handleDelete = (index: number) => {
-    deleteTodo(index);
+  const handleDelete = (id: number) => {
+    deleteTodo(id);
   };
 
   return (
@@ -42,16 +50,20 @@ export default function App() {
 
       <Text style={styles.title}>Дела на день:</Text>
       <ScrollView style={styles.scroll}>
-      {dataStore.map((item, index) => (
-        <View style={[styles.universeContainer, styles.itemContainer]} key={index}>
-          <View style={styles.items}>
-            <Text style={styles.text}>{item.task}</Text>
-          </View>
-          <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
-        </View>
-      ))}
+        {dataStore.map((item) => (
+          <TouchableOpacity key={item.id} onPress={() => navigation.navigate('TodoDetails', { itemId: item.id })}>
+            <View style={[styles.universeContainer, styles.itemContainer]}>
+              <View style={styles.items}>
+                <Text style={styles.text}>{item.task}</Text>
+              </View>
+              <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
       <StatusBar style="auto" />
     </View>
   );
 }
+
+export default App;
