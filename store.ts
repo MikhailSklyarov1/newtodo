@@ -14,13 +14,13 @@ interface Store {
 }
 
 const useStore = create<Store>((set) => ({
-    dataStore: [{ task: "", id: 0 }],
+    dataStore: [],
 
     getTodos: () => {
         axios.get<TodoItem[]>('http://unit-vlg.ru:9000/api/actions/getAll')
             .then(res => {
-                const todo = res.data;
-                const mainData = todo.map(item => ({
+                const todos = res.data;
+                const mainData = todos.map(item => ({
                     task: item.task,
                     id: item.id
                 }));
@@ -45,12 +45,15 @@ const useStore = create<Store>((set) => ({
     },
 
     createTodo: (newTodo) => {
-        axios.post<TodoItem>('http://unit-vlg.ru:9000/api/actions/create', newTodo)
+        axios.post<TodoItem[]>('http://unit-vlg.ru:9000/api/actions/create', newTodo)
             .then(res => {
-                const todo = res.data;
+                const todos = res.data;
+                const nameAndIdList = todos.map(item => ({
+                    id: item.id,
+                    task: item.task
+                }));
                 set((state) => {
-                    const updatedDataStore = [...state.dataStore, { task: todo.task, id: todo.id }];
-                    return { dataStore: updatedDataStore };
+                    return { dataStore: nameAndIdList };
                 });
             })
             .catch(error => {
