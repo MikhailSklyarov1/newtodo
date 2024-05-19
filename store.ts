@@ -14,6 +14,7 @@ interface Store {
     getTodos: () => void;
     deleteTodo: (id: number) => void;
     createTodo: (newTodo: { name: string, task: string, isComplete: boolean }) => void;
+    updateTodo: (newTodo: { name: string, task: string, isComplete: boolean }, id: number) => void;
     getSubTodos: (idTodo: number | undefined) => void;
     deleteSubTodo: (id: number, idSub: number) => void;
     createSubTodo: (newTodo: TodoItem, id: number | undefined) => void;
@@ -65,6 +66,23 @@ const useStore = create<Store>((set) => ({
             })
             .catch(error => {
                 console.error('Error creating todo:', error);
+            });
+    },
+
+    updateTodo: (newTodo, id: number) => {
+        axios.put<TodoItem[]>(`http://unit-vlg.ru:9000/api/actions/update?id=${id}`, newTodo)
+            .then(res => {
+                const todos = res.data;
+                const nameAndIdList = todos.map(item => ({
+                    id: item.id,
+                    task: item.task
+                }));
+                set((state) => {
+                    return { dataStore: nameAndIdList };
+                });
+            })
+            .catch(error => {
+                console.error('Error updating todo:', error);
             });
     },
 

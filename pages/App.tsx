@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar, TextInput, Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {
+  StatusBar,
+  TextInput,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
 import styles from '../style';
 import ActionButton from '../components/ActionButton';
 import useStore from '../store';
-import Icon from 'react-native-vector-icons/Ionicons'; 
-
 
 type RootStackParamList = {
   Home: undefined;
-  TodoDetails: { itemId: number };
+  TodoDetails: {itemId: number};
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
@@ -21,21 +26,35 @@ interface Props {
   route: HomeScreenRouteProp;
 }
 
-const App: React.FC<Props> = ({ navigation }) => {
+const App: React.FC<Props> = ({navigation}) => {
   const [text, setText] = useState<string>('');
-  const { dataStore, getTodos, deleteTodo, createTodo } = useStore();
+  const [editId, setEditId] = useState<number>(0);
+  const {dataStore, getTodos, deleteTodo, createTodo, updateTodo} = useStore();
 
   useEffect(() => {
     getTodos();
   }, []);
 
   const showInfoAlert = () => {
-    createTodo({ name: 'default', task: text, isComplete: false });
-    setText(''); // очищаем текстовое поле после добавления
+    if (editId > 0) {
+      updateTodo({name: 'default', task: text, isComplete: false}, editId);
+      setEditId(0);
+    } else {
+      createTodo({name: 'default', task: text, isComplete: false});
+      setText('');
+    }
   };
 
   const handleDelete = (id: number) => {
     deleteTodo(id);
+  };
+
+  const handleEdit = (id: number) => {
+    const taskToEdit = dataStore.find(item => item.id === id);
+    if (taskToEdit) {
+      setText(taskToEdit.task);
+      setEditId(id);
+    }
   };
 
   return (
@@ -45,22 +64,31 @@ const App: React.FC<Props> = ({ navigation }) => {
           style={styles.input}
           placeholder="Введите текст"
           value={text}
-          onChangeText={(text) => setText(text)}
+          onChangeText={text => setText(text)}
         />
         <ActionButton onPress={showInfoAlert} action={'+'} />
       </View>
 
       <Text style={styles.title}>Картегории:</Text>
       <ScrollView style={styles.scroll}>
-        {dataStore.map((item) => (
-          <TouchableOpacity key={item.id} onPress={() => navigation.navigate('TodoDetails', { itemId: item.id })}>
+        {dataStore.map(item => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() =>
+              navigation.navigate('TodoDetails', {itemId: item.id})
+            }>
             <View style={[styles.universeContainer, styles.itemContainer]}>
               <View style={styles.items}>
                 <Text style={styles.text}>{item.task}</Text>
               </View>
-              <ActionButton onPress={() => handleDelete(item.id)} action={'x'} />
-              <ActionButton onPress={() => handleDelete(item.id)} action={'ed'} />
-              <Icon name="pencil" size={30}color="#4F8EF7" />
+              <ActionButton
+                onPress={() => handleDelete(item.id)}
+                action={'x'}
+              />
+              <ActionButton
+                onPress={() => handleEdit(item.id)}
+                action={'edit'}
+              />
             </View>
           </TouchableOpacity>
         ))}
@@ -68,6 +96,6 @@ const App: React.FC<Props> = ({ navigation }) => {
       <StatusBar style="auto" />
     </View>
   );
-}
+};
 
 export default App;
